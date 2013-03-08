@@ -1334,10 +1334,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\resource1.h"
-				>
-			</File>
-			<File
 				RelativePath=".\SimpleZip.h"
 				>
 			</File>
@@ -1538,10 +1534,6 @@
 						Name="VCResourceCompilerTool"
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\ZipArchive1.rc"
-				>
 			</File>
 		</Filter>
 		<Filter
