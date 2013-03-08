@@ -1,8 +1,12 @@
 #include "StdAfx.h"
 #include "VitualMem.h"
 
+
 CVitualMem::CVitualMem(void)
+:m_nMaxMCount(1024)
+,m_nCurCount(0)
 {
+	m_pMemSave = new int [1024][2];
 }
 
 CVitualMem::~CVitualMem(void)
@@ -40,6 +44,13 @@ PVOID CVitualMem::Push( IN char* pData, IN int nSzie, OUT DWORD& dwRealSize )
 	{
 
 	}
+
+	if (m_nCurCount+1>=m_nMaxMCount)
+	{
+		DEBUGMSG("Mem count no left", 0);
+	}
+	m_pMemSave[m_nCurCount][0] = (int)pVoid;
+	m_pMemSave[m_nCurCount++][1] = dwRealSize;
 	return pVoid;
 }
 

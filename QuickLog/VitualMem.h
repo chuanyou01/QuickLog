@@ -8,7 +8,9 @@ private:
 	DWORD	m_dwMaxPhysicalSize;
 	DWORD	m_dwPhysicalSize;
 
-	
+	int		m_nMaxMCount;
+
+	int (*m_pMemSave)[2];
 
 	void Free();
 public:
