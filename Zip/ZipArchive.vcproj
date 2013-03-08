@@ -1,9 +1,10 @@
-<?xml version="1.0" encoding="windows-1250"?>
+<?xml version="1.0" encoding="gb2312"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="ZipArchive"
 	ProjectGUID="{A51CF340-B0EA-4C9B-A2FA-4D7487692EF5}"
+	RootNamespace="ZipArchive"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -18,7 +19,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../lib"
-			IntermediateDirectory="Debug"
+			IntermediateDirectory="..\..\mid"
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="2"
@@ -1333,6 +1334,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\resource1.h"
+				>
+			</File>
+			<File
 				RelativePath=".\SimpleZip.h"
 				>
 			</File>
@@ -1533,6 +1538,10 @@
 						Name="VCResourceCompilerTool"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\ZipArchive1.rc"
+				>
 			</File>
 		</Filter>
 		<Filter

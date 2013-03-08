@@ -16,5 +16,12 @@ using namespace std;
 #include "mxdi.h"
 #include "TreeDB.h"
 #include "..\Zip\SimpleZip.h"
+#include "LogHelp.h"
+#include "DbgHelp.h"
+
+#define OUT
+#define IN
+#define INOUT
+
 
 // TODO: 在此处引用程序需要的其他头文件

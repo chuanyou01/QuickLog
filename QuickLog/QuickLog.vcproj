@@ -18,7 +18,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			OutputDirectory="..\..\$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="1"
@@ -174,7 +174,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\CommObj.cpp"
+				RelativePath=".\DbgHelp.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LogHelp.cpp"
 				>
 			</File>
 			<File
@@ -201,6 +205,10 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\VitualMem.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Í·ÎÄ¼þ"
@@ -208,7 +216,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\CommObj.h"
+				RelativePath=".\DbgHelp.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LogHelp.h"
 				>
 			</File>
 			<File
@@ -217,6 +229,10 @@
 			</File>
 			<File
 				RelativePath=".\targetver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\VitualMem.h"
 				>
 			</File>
 		</Filter>
