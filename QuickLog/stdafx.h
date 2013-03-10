@@ -19,6 +19,10 @@ using namespace std;
 #include "LogHelp.h"
 #include "DbgHelp.h"
 
+#include "Tools/MCriticalSectioin.h"
+#include "Tools/LockCritalSection.h"
+
+
 #define OUT
 #define IN
 #define INOUT

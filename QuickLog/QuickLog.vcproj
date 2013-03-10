@@ -178,7 +178,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Tools\LockCritalSection.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\LogHelp.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tools\MCriticalSectioin.cpp"
 				>
 			</File>
 			<File
@@ -220,7 +228,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Tools\LockCritalSection.h"
+				>
+			</File>
+			<File
 				RelativePath=".\LogHelp.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Tools\MCriticalSectioin.h"
 				>
 			</File>
 			<File
