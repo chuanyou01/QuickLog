@@ -4,11 +4,8 @@
 static int s_PageSize = 4096;
 
 CVitualMem::CVitualMem(void)
-:m_nMaxMCount(1024)
-,m_nCurCount(0)
-, m_dwPhysicalSize(0)
+: m_dwPhysicalSize(0)
 {
-	InitializeCriticalSection(&m_lockMem);
 	m_pMemSave = new int [65536][3];
 }
 
@@ -23,7 +20,6 @@ void CVitualMem::Free()
 	{
 		DEBUGMSG("Free mem failed", GetLastError());
 	}
-	DeleteCriticalSection(&m_lockMem);
 }
 
 void CVitualMem::Init( DWORD dwMaxSize )
@@ -36,17 +32,47 @@ void CVitualMem::Init( DWORD dwMaxSize )
 	}
 }
 
+BOOL CVitualMem::PushToFree(IN char* pData, IN int nSize, OUT DWORD& dwRealSize, INOUT PVOID pVoid)
+{
+	for (map<char*, meminfo*>::iterator it = m_mapMemFree.begin();
+		it!=m_mapMemFree.end(); it++)
+	{
+		meminfo* pInfo = it->second;
+		if (pInfo->nRealSize>nSize)
+		{
+			pVoid = it->first;
+
+			dwRealSize = pInfo->nRealSize;
+			RemoveFreeMap((char*)pVoid);
+			SetSaveMap((char*)pVoid, nSize, dwRealSize);
+
+			memcpy_s(pVoid, dwRealSize, pData, nSize);
+
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 PVOID CVitualMem::Push( IN char* pData, IN int nSize, OUT DWORD& dwRealSize, INOUT PVOID pVoid/*=NULL*/ )
 {
+	BOOL bDone = FALSE;
 	__try
 	{
-		dwRealSize = ((nSize + s_PageSize - 1)/s_PageSize )* s_PageSize;
-		if (pVoid==NULL)
+		if (!m_mapMemFree.empty())
 		{
-			char* pTmp = ((char*)m_Head + m_dwPhysicalSize);
-			pVoid = pTmp;
+			bDone = PushToFree(pData, nSize, dwRealSize, pVoid);			
 		}
-		memcpy_s(pVoid, dwRealSize, pData, nSize);
+		if (!bDone)
+		{
+			dwRealSize = ((nSize + s_PageSize - 1)/s_PageSize )* s_PageSize;
+			if (pVoid==NULL)
+			{
+				char* pTmp = ((char*)m_Head + m_dwPhysicalSize);
+				pVoid = pTmp;
+			}
+			memcpy_s(pVoid, dwRealSize, pData, nSize);
+		}
 
 	}
 	__except(EXCEPTION_EXECUTE_HANDLER)
@@ -54,17 +80,10 @@ PVOID CVitualMem::Push( IN char* pData, IN int nSize, OUT DWORD& dwRealSize, INO
 		VirtualAlloc(pVoid, dwRealSize, MEM_COMMIT, PAGE_READWRITE);
 		memcpy_s(pVoid, dwRealSize, pData, nSize);
 	}
-
-	if (m_nCurCount+1>=m_nMaxMCount)
+	if (!bDone)
 	{
-		DEBUGMSG("Mem count no left", 0);
+		SetSaveMap((char*)pVoid, nSize, dwRealSize);
 	}
-	EnterCriticalSection(&m_lockMem);
-	m_dwPhysicalSize += dwRealSize;
-	m_pMemSave[m_nCurCount][0] = (int)pVoid;
-	m_pMemSave[m_nCurCount][1] = dwRealSize;
-	m_pMemSave[m_nCurCount++][2] = nSize;
-	LeaveCriticalSection(&m_lockMem);
 	return pVoid;
 }
 
@@ -81,22 +100,86 @@ int CVitualMem::GetPMemSize()
 BOOL CVitualMem::FreeData( char* pVoid )
 {
 	BOOL bRet = FALSE;
-
-
+	meminfo* pMemInfo = GetMemInfo(m_mapMemSave, pVoid);
+	if (pMemInfo!=NULL)
+	{
+		RemoveSaveMap(pVoid);
+		SetFreeMap(pVoid, pMemInfo->nSize, pMemInfo->nRealSize);
+		bRet = TRUE;
+	}
 	return bRet;
 }
 
 int CVitualMem::GetSize( IN PVOID pVoid, OUT int &nRealSize )
 {
 	int nSize = 0;
-	for (int i = 0; i<m_nCurCount; i++)
+	CLockCriticalSection mlock(&m_lockMem);
+	meminfo* pMemInfo = GetMemInfo(m_mapMemSave, pVoid);
+	if (pMemInfo!=NULL)
 	{
-		if (int(pVoid)==m_pMemSave[i][0])
-		{
-			nSize = m_pMemSave[i][2];
-			nRealSize = m_pMemSave[i][1];
-			break;
-		}
+		nRealSize = pMemInfo->nRealSize;
+		nSize = pMemInfo->nSize;
 	}
 	return nSize;
+}
+
+meminfo* CVitualMem::GetMemInfo(IN map<char*, meminfo*>& mapMem, IN PVOID pVoid )
+{
+	meminfo* pMemInfo = NULL;
+	map<char*, meminfo*>::iterator it = mapMem.find((char*)pVoid);
+	if (it!=mapMem.end())
+	{
+		pMemInfo = it->second;
+	}
+	return pMemInfo;
+}
+
+void CVitualMem::SetSaveMap( IN char* pVoid,IN int nSize,IN int nRealSize )
+{
+	CLockCriticalSection mlock(&m_lockMem);
+
+	meminfo* pMemInfo = NULL;
+	if (m_mapMemSave.find(pVoid)!=m_mapMemSave.end())
+	{
+		pMemInfo = m_mapMemSave[pVoid];
+	}
+	else
+	{
+		pMemInfo = new meminfo;
+		m_mapMemSave[pVoid] = pMemInfo;
+	}
+
+	pMemInfo->nRealSize = nRealSize;
+	pMemInfo->nSize = nSize;
+}
+
+void CVitualMem::RemoveSaveMap( IN char* pVoid )
+{
+	CLockCriticalSection mlock(&m_lockMem);
+	m_mapMemSave.erase(pVoid);
+}
+
+void CVitualMem::SetFreeMap( IN char* pVoid, IN int nSize, IN int nRealSize )
+{
+	CLockCriticalSection mlock(&m_lockFreeMem);
+
+	meminfo* pMemInfo = NULL;
+	if (m_mapMemFree.find(pVoid)!=m_mapMemFree.end())
+	{
+		pMemInfo = m_mapMemFree[pVoid];
+	}
+	else
+	{
+		pMemInfo = new meminfo;
+		m_mapMemFree[pVoid] = pMemInfo;
+	}
+
+	pMemInfo->nRealSize = nRealSize;
+	pMemInfo->nSize = nSize;
+}
+
+void CVitualMem::RemoveFreeMap( IN char* pVoid )
+{
+	CLockCriticalSection mlock(&m_lockFreeMem);
+	m_mapMemFree.erase(pVoid);
 }

@@ -190,6 +190,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MemSet.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\QuickLog.cpp"
 				>
 			</File>
@@ -237,6 +241,10 @@
 			</File>
 			<File
 				RelativePath=".\Tools\MCriticalSectioin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MemSet.h"
 				>
 			</File>
 			<File

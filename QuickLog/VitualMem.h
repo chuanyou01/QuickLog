@@ -1,5 +1,11 @@
 #pragma once
 
+struct meminfo 
+{
+	int nSize;
+	int nRealSize;
+};
+
 class CVitualMem
 {
 private:
@@ -9,13 +15,15 @@ private:
 	DWORD	m_dwMaxPhysicalSize;
 	DWORD	m_dwPhysicalSize;
 
-	int		m_nMaxMCount;
-	int		m_nCurCount;
-
-	CRITICAL_SECTION	m_lockMem;
+	CMCriticalSectioin	m_lockMem;
+	CMCriticalSectioin	m_lockFreeMem;
 	int (*m_pMemSave)[3];
 
-	int GetSize(IN PVOID pVoid, OUT int &nRealSize);// return - size 
+	map<char*, meminfo*> m_mapMemSave;
+	map<char*, meminfo*> m_mapMemFree;
+
+	int GetSize( IN PVOID pVoid, OUT int &nRealSize );// return - size 
+	meminfo* GetMemInfo(IN map<char*, meminfo*>& mapMem, IN PVOID pVoid);
 
 	void Free();
 public:
@@ -39,9 +47,15 @@ public:
 	//************************************
 	PVOID Push(IN char* pData, IN int nSize, OUT DWORD& dwRealSize, INOUT PVOID pVoid=NULL);
 
-	BOOL FreeData(char* pVoid);//删除数据时使用， 将m_pMemSave 最后一个值与当前地址值交换， 并将m_nCurcount -1 完成删除
+	BOOL FreeData(IN char* pVoid);//删除数据时使用， 
+private:
+	void SetSaveMap(IN char* pVoid,IN int nSize,IN int nRealSize);
+	void RemoveSaveMap(IN char* pVoid);
 
-	
+	void SetFreeMap(IN char* pVoid, IN int nSize, IN int nRealSize);
+	void RemoveFreeMap(IN char* pVoid);
+	BOOL PushToFree(IN char* pData, IN int nSize, OUT DWORD& dwRealSize, INOUT PVOID pVoid);
+
 
 
 };

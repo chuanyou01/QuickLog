@@ -10,5 +10,5 @@ CLockCriticalSection::CLockCriticalSection( CMCriticalSectioin *mCriticalSection
 
 CLockCriticalSection::~CLockCriticalSection()
 {
-	//LeaveCriticalSection(&m_CriticalSection->m_citiaclSection);
+	LeaveCriticalSection(&m_CriticalSection->m_citiaclSection);
 }

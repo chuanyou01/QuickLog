@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <tchar.h>
 #include <string>
+#include <map>
 
 using namespace std;
 #include "MxErrorDef.h"
